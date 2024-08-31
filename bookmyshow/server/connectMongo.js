@@ -2,7 +2,7 @@ const mongodb = require("mongodb");
 const express = require("express");
 require("dotenv").config();
 
-const mongoURI = "mongodb://0.0.0.0:27017/";
+const mongoURI = process.env.MONGO_DB_URI;
 
 let mongoose = require("mongoose");
 const { bookMovieSchema } = require("./schema");
