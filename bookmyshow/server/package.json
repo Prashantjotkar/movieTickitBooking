@@ -5,7 +5,8 @@
   "main": "getDetails.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon getdetails.js"
+    "dev": "nodemon getdetails.js",
+    "start":"node getdetails.js"
 
   },
   "keywords": [],
