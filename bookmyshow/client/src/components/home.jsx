@@ -1,36 +1,40 @@
+import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import SelectMovie from "./selectMovie";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
+import SelectMovie from "./SelectMovie";
+import SelectTimeSlot from "./SelectTimeSlot";
+import SelectSeats from "./SelectSeats";
+import LastBookingDetails from "./LastBookingDetails";
 import { movies, seats, slots } from "./data";
-import SelectTimeSlot from "./selectTimeSlot";
-import SelectSeats from "./selectSeat";
-import LastBooking from "./lastBoookingDetails";
-import React, { useEffect, useState } from "react";
-import LocalStorage from "./localStorage";
+import useLocalStorage from "./UseLocalStorage";
+// import axios from "../axiosConfig";
 import axios from "axios";
 
-export default function Home() {
-  const initialState = {
-    movie: "",
-    seats: {
-      a1: 0,
-      a2: 0,
-      a3: 0,
-      a4: 0,
-      d1: 0,
-      d2: 0,
-    },
-    slots: "",
-  };
 
-  const [state, setState] = LocalStorage("state", initialState);
+
+const initialState = {
+  movie: "",
+  timeSlots: "",
+  seats: {
+    a1: 0,
+    a2: 0,
+    a3: 0,
+    a4: 0,
+    d1: 0,
+    d2: 0,
+  },
+};
+
+const Home = () => {
+  const [state, setState] = useLocalStorage("state", initialState);
+
   const [lastBooking, setLastBooking] = useState({
     movie: "",
-    slots: "",
-    dataPresent: false,
+    timeSlots: "",
     isFinishLoading: false,
+    dataPresent: false,
     isLoading: false,
     error: null,
     seats: {
@@ -44,13 +48,13 @@ export default function Home() {
   });
 
   useEffect(() => {
+    //getting api data
     setLastBooking({ isFinishLoading: false });
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     axios
-      .get(`${backendUrl}/getDetails/`)
+      .get("http://localhost:3001/api/getDetails")
       .then((res) => {
-        if (res.data.message === "string") {
+        if (typeof res.data.message === "string") {
           setLastBooking({
             ...lastBooking,
             error: res.data.message,
@@ -63,10 +67,9 @@ export default function Home() {
           setLastBooking({
             ...lastBooking,
             movie: movie,
-            slots: slot,
-            error: null,
-            isFinishLoading: true,
+            timeSlots: slot,
             dataPresent: true,
+            isFinishLoading: true,
             seats: {
               a1: seats.A1 ? seats.A1 : 0,
               a2: seats.A2 ? seats.A2 : 0,
@@ -74,14 +77,14 @@ export default function Home() {
               a4: seats.A4 ? seats.A4 : 0,
               d1: seats.D1 ? seats.D1 : 0,
               d2: seats.D2 ? seats.D2 : 0,
-            }
-
+            },
+            error: null,
           });
         } else {
           setLastBooking({
             ...lastBooking,
+            dataPresent: false,
             isFinishLoading: true,
-            dataPresent: true,
           });
         }
       })
@@ -94,14 +97,26 @@ export default function Home() {
       });
   }, []);
 
-  const movieSelection = (item) => {
+  // set state of movie selector in a function
+  const movieSelectHandler = (item) => {
+    //update state
     setState((preState) => ({
       ...preState,
       movie: item,
     }));
   };
 
-  const seatSelection = (e) => {
+  // set state of time Slot in a function
+  const timeSlotSelectHandler = (item) => {
+    //update state
+    setState((preState) => ({
+      ...preState, //copy
+      timeSlots: item,
+    }));
+  };
+
+  //set state of seats in a function
+  const seatSelectHandler = (e) => {
     setState({
       ...state,
       seats: {
@@ -111,16 +126,9 @@ export default function Home() {
     });
   };
 
-  const slotSelection = (item) => {
-    setState((preState) => ({
-      ...preState,
-      slots: item,
-    }));
-  };
-
-
   const submitBooking = (e) => {
-    const { movie, slots, seats } = state;
+    const { movie, timeSlots, seats } = state;
+
     // Validation
     const notSelectedAnySeat = Object.values(seats).every(
       (field) => field === 0
@@ -129,26 +137,24 @@ export default function Home() {
     if (movie === "") {
       enqueueSnackbar("Please Select a movie", { variant: "error" });
       return;
-    } else if (slots === "") {
+    } else if (timeSlots === "") {
       enqueueSnackbar("Please Select a time slot", { variant: "error" });
       return;
     } else if (notSelectedAnySeat) {
       enqueueSnackbar("Please Select Atleast one seat", { variant: "error" });
       return;
-    }
-
+    } 
     setLastBooking({
       ...lastBooking,
+
       isLoading: true,
     });
 
-    const backendUrl1 = process.env.REACT_APP_BACKEND_URL;
-
-    // post request
+    //post request
     axios
-      .post(`${backendUrl1}/getDetails/`, {
+      .post("http://localhost:3001/api/getDetails", {
         movie: state.movie,
-        slot: state.slots,
+        slot: state.timeSlots,
         seats: {
           A1: Number(state.seats.a1),
           A2: Number(state.seats.a2),
@@ -157,17 +163,20 @@ export default function Home() {
           D1: Number(state.seats.d1),
           D2: Number(state.seats.d2),
         },
-
       })
+
       .then((res) => {
-        if (res.status === 200) {
+        console.log(res.status)
+
+        if (res.status === 201) {
+
           //set state in last bookings details
           setLastBooking({
             ...lastBooking,
             movie: state.movie,
-            slots: state.slots,
+            timeSlots: state.timeSlots,
             dataPresent: true,
-            isFinishLoading: true,
+            iSFinishLoading: true,
             isLoading: false,
             seats: {
               a1: state.seats.a1,
@@ -181,7 +190,7 @@ export default function Home() {
           setState({
             ...state,
             movie: "",
-            slots: "",
+            timeSlots: "",
             dataPresent: false,
             iSFinishLoading: false,
             seats: {
@@ -195,11 +204,6 @@ export default function Home() {
           });
         }
         enqueueSnackbar("Booking successful!", { variant: "success" });
-
-        setLastBooking({
-          ...lastBooking,
-          isLoading: false,
-        });
       })
       .catch((error) => {
         setLastBooking({
@@ -208,47 +212,55 @@ export default function Home() {
         });
         console.log(error);
       });
-
-    return;
   };
-
   return (
     <Container className="mt-5 bg-custom">
       <SnackbarProvider />
-      <h3 className="mb-5 ml-5">Book That Show !!</h3>
+      {/* Main Heading */}
+      <Row>
+        <Col className="p-3">
+          <h3 className="">Book That Show!!</h3>
+        </Col>
+      </Row>
+
       <Row>
         <Col md={8} lg={8} sm={8} xs={12}>
+          {/* Movies Container */}
           <SelectMovie
             mainHeading="Select a Movie"
             items={movies}
-            selectedValue={state?.movie}
-            onClick={movieSelection}
+            selectedValue={state.movie}
+            onClick={movieSelectHandler}
             display="block"
           />
-          {/* Movies Container */}
+          {/* Time slot Container */}
           <SelectTimeSlot
-            mainHeading="Select a Time"
+            mainHeading="Select a Time Slot"
             items={slots}
-            selectedValue={state?.slots}
-            onClick={slotSelection}
+            selectedValue={state.timeSlots}
+            onClick={timeSlotSelectHandler}
             display="block"
           />
-          {/* Movies Container */}
+
+          {/* Seats Container */}
           <SelectSeats
-            mainHeading="Select a Seat"
+            mainHeading="Select the Seats"
             items={seats}
             type="number"
-            selectedValue={state?.seats}
-            onChange={seatSelection}
-            display="block"
+            selectedValue={state.seats}
+            seats={state.seats}
+            onChange={seatSelectHandler}
             submitBooking={submitBooking}
           />
         </Col>
+
+        {/* Last Booking Container */}
+
         <Col md={4} lg={4} sm={4} xs={12} className="text-center">
-          <LastBooking
+          <LastBookingDetails
             movieName={lastBooking.movie}
             finishLoading={lastBooking.isFinishLoading}
-            timing={lastBooking.slots}
+            timing={lastBooking.timeSlots}
             seat={lastBooking.seats}
             lastBookingPresent={lastBooking.dataPresent}
             errorMsg={lastBooking?.error}
@@ -258,4 +270,6 @@ export default function Home() {
       </Row>
     </Container>
   );
-}
+};
+
+export default Home;

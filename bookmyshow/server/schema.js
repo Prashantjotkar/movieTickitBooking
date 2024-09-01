@@ -1,18 +1,23 @@
+const { Schema } = require("mongoose");
+const mongoose = require("mongoose");
 
-const { Schema } = require('mongoose');
+const seatSchema = new Schema(
+  {
+    A1: { type: Schema.Types.Number, required: true },
+    A2: { type: Schema.Types.Number, required: true },
+    A3: { type: Schema.Types.Number, required: true },
+    A4: { type: Schema.Types.Number, required: true },
+    D1: { type: Schema.Types.Number, required: true },
+    D2: { type: Schema.Types.Number, required: true },
+  },
+  { _id: false }
+);
 
 const bookMovieSchema = new Schema({
-    movie: Schema.Types.String,
-    slot: Schema.Types.String,
-    seats: {
-        A1: Schema.Types.Number,
-        A2: Schema.Types.Number,
-        A3: Schema.Types.Number,
-        A4: Schema.Types.Number,
-        D1: Schema.Types.Number,
-        D2: Schema.Types.Number
-    }
+  movie: { type: Schema.Types.String, required: true },
+  slot: { type: Schema.Types.String, required: true },
+  seats: { type: seatSchema, required: true },
+});
+const BookMovieCollection = mongoose.model("bookmovietickets", bookMovieSchema);
 
-})
-
-exports.bookMovieSchema = bookMovieSchema;
+module.exports = BookMovieCollection;
