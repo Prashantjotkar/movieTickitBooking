@@ -1,26 +1,39 @@
-
-
-
-import React from "react";
 import Loader from "./Loader";
+import React from "react";
 
-const LastBookingDetails = (props) => {
+const LastBooking = (props) => {
   const {
     lastBookingPresent,
     seat,
     timing,
     movieName,
     errorMsg,
-    finishLoading,
     loading,
+    finishLoading,
   } = props;
-  const seatLabels = [
-    { label: "A1", key: "a1" },
-    { label: "A2", key: "a2" },
-    { label: "A3", key: "a3" },
-    { label: "A4", key: "a4" },
-    { label: "D1", key: "d1" },
-    { label: "D2", key: "d2" },
+
+
+  const seatNumbers = [
+    {
+      label: "A1",
+      key: "a1",
+    },
+    {
+      label: "A2",
+      key: "a2",
+    },
+    {
+      label: "A3",
+      key: "a3",
+    },
+    {
+      label: "D1",
+      key: "d1",
+    },
+    {
+      label: "D2",
+      key: "d2",
+    },
   ];
   return (
     <div className="LastBooking">
@@ -29,21 +42,20 @@ const LastBookingDetails = (props) => {
         <Loader />
       ) : (
         <>
-          {/* Check if there are any previous bookings */}
           {finishLoading && lastBookingPresent === false && errorMsg && (
             <div>
               <h3 className="error_msg fs-4">{errorMsg}</h3>{" "}
               {/* Display a message when no previous booking is found */}
             </div>
           )}
-          {/* when last booking data is present and data fetching is finish*/}
 
-          {lastBookingPresent && finishLoading && (
+          {finishLoading && lastBookingPresent && (
             <div className="details-container">
               <div className="heading_details">Seats:</div>
               <div className="booked_seat_wrapper">
                 {/* map function for seat label */}
-                {seatLabels.map(({ label, key }) => (
+                {seatNumbers.map(({ label, key }) => (
+                  
                   <div className="d-flex align-items-center" key={key}>
                     <span className="booking_seat_sp">{`${label}:`}</span>
                     {seat && seat[key] ? (
@@ -52,8 +64,12 @@ const LastBookingDetails = (props) => {
                       <span className="seat_booked">{``}</span>
                     )}
                   </div>
-                ))}
+
+                ))
+
+                }
               </div>
+
               <div>
                 <span className="heading_details">Slot:</span>{" "}
                 <span className="seat_b">{timing}</span>
@@ -63,11 +79,11 @@ const LastBookingDetails = (props) => {
                 <span className="name_movie">{movieName}</span>
               </div>
             </div>
-          )}
+           )} 
         </>
       )}
     </div>
   );
 };
 
-export default LastBookingDetails;
+export default LastBooking;

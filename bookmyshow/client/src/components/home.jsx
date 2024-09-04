@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
-import SelectMovie from "./SelectMovie";
-import SelectTimeSlot from "./SelectTimeSlot";
-import SelectSeats from "./SelectSeats";
-import LastBookingDetails from "./LastBookingDetails";
+import SelectMovie from "./selectMovie";
+import SelectTimeSlot from "./selectTimeSlot";
+import SelectSeats from "./selectSeat";
+import LastBookingDetails from "./lastBookingDetails";
 import { movies, seats, slots } from "./data";
-import useLocalStorage from "./UseLocalStorage";
+import LocalStorage from "./localStorage";
 // import axios from "../axiosConfig";
 import axios from "axios";
-
+import React, { useEffect, useState } from "react";
 
 
 const initialState = {
@@ -28,7 +27,7 @@ const initialState = {
 };
 
 const Home = () => {
-  const [state, setState] = useLocalStorage("state", initialState);
+  const [state, setState] = LocalStorage("state", initialState);
 
   const [lastBooking, setLastBooking] = useState({
     movie: "",
@@ -52,7 +51,7 @@ const Home = () => {
     setLastBooking({ isFinishLoading: false });
 
     axios
-      .get("http://localhost:3001/api/getDetails")
+      .get("https://book-that-show.onrender.com/api/booking")
       .then((res) => {
         if (typeof res.data.message === "string") {
           setLastBooking({
@@ -152,7 +151,7 @@ const Home = () => {
 
     //post request
     axios
-      .post("http://localhost:3001/api/getDetails", {
+      .post("https://book-that-show.onrender.com/api/booking", {
         movie: state.movie,
         slot: state.timeSlots,
         seats: {
@@ -166,10 +165,7 @@ const Home = () => {
       })
 
       .then((res) => {
-        console.log(res.status)
-
-        if (res.status === 201) {
-
+        if (res.status === 200) {
           //set state in last bookings details
           setLastBooking({
             ...lastBooking,
@@ -192,6 +188,7 @@ const Home = () => {
             movie: "",
             timeSlots: "",
             dataPresent: false,
+
             iSFinishLoading: false,
             seats: {
               a1: 0,

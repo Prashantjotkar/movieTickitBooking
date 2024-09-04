@@ -1,8 +1,9 @@
 import React from "react";
+
+import Container from "react-bootstrap/Container";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Col from "react-bootstrap/esm/Col";
-import Row from "react-bootstrap/esm/Row";
-import Container from "react-bootstrap/esm/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 const SelectMovie = (props) => {
   const { mainHeading, items, selectedValue, onClick } = props;
@@ -13,16 +14,16 @@ const SelectMovie = (props) => {
           <h4 className="ContainerHeading">{mainHeading}</h4>
           <ButtonGroup
             aria-label="Basic outlined example"
-            className="d-inline-block"
+            className="d-inline-block mt-3"
           >
-            {items.map((item, i) => (
+            {items.map((item, i)=>(
               <React.Fragment key={i}>
                 <button
                   type="button"
                   className={
                     item === selectedValue
-                      ? "btn btn-danger btn-active shadow-none btnSelector"
-                      : "btn btn-outline-secondary btnSelector"
+                      ? "btn btn-success btn-active shadow-none"
+                      : "btn btn-outline-secondary "
                   }
                   style={{
                     marginRight: "15px",
